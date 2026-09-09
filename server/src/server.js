@@ -6,6 +6,8 @@ const { usersRoutes } = require('./routes/users.routes');
 const { transactionsRoutes } = require('./routes/transactions.routes');
 const { budgetsRoutes } = require('./routes/budgets.routes');
 const { reportsRoutes } = require('./routes/reports.routes');
+const { userRoutes } = require('./routes/user.routes');
+
 
 const app = express();
 app.use(cors());
@@ -16,6 +18,8 @@ app.use('/api/users', usersRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/budgets', budgetsRoutes);
 app.use('/api/reports', reportsRoutes);
+app.use('/api/users', userRoutes);
+
 
 app.listen(config.port, () => {
   console.log(`API listening on http://localhost:${config.port}`);
