@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: expense-tracker-api
+    env: node
+    buildCommand: npm install
+    startCommand: node server/src/server.js
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
