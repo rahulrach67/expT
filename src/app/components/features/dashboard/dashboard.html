@@ -1,0 +1,22 @@
+<div class="dashboard-shell">
+	<app-sidenav />
+	<main class="dashboard-content">
+		<header class="dashboard-header"><div><p class="eyebrow">Monday, 24 August 2026</p><h1>Good morning, Rahul</h1><p class="subtitle">Here is your spending snapshot for this month.</p></div><button class="add-button" type="button"><span aria-hidden="true">+</span> Add expense</button></header>
+
+		<section class="summary-grid" aria-label="Expense summary">
+			<article class="summary-card"><span class="card-icon green">$</span><p>Total balance</p><strong>₹24,580</strong><small class="positive">+8.2% <span>vs last month</span></small></article>
+			<article class="summary-card"><span class="card-icon orange">↗</span><p>Monthly spending</p><strong>₹12,430</strong><small class="negative">+4.6% <span>vs last month</span></small></article>
+			<article class="summary-card"><span class="card-icon blue">▣</span><p>Receipts logged</p><strong>38</strong><small class="positive">+12.0% <span>vs last month</span></small></article>
+		</section>
+
+		<section class="chart-card" aria-labelledby="chart-title">
+			<div class="section-heading"><div><h2 id="chart-title">Payments &amp; receipts</h2><p>Track your activity across the last six months.</p></div><div class="legend"><span class="payment-key"></span>Payments <span class="receipt-key"></span>Receipts</div></div>
+			<div class="chart" aria-label="Bar chart showing payments and receipts from January to June">
+				<div class="y-axis"><span>100</span><span>75</span><span>50</span><span>25</span><span>0</span></div>
+				<div class="chart-area"><div class="grid-lines"><i></i><i></i><i></i><i></i><i></i></div>@for (data of chartData; track data.month) {<div class="bars"><div class="bar-group"><span class="bar payment" [style.height.%]="data.payments"></span><span class="bar receipt" [style.height.%]="data.receipts"></span></div><small>{{ data.month }}</small></div>}</div>
+			</div>
+		</section>
+
+		<section class="bottom-grid"><article class="activity-card"><div class="section-heading"><div><h2>Recent transactions</h2><p>Your latest payments and receipts.</p></div><a href="/dashboard">View all</a></div><div class="transaction"><span class="transaction-icon food">F</span><div><strong>Fresh Market</strong><small>Today, 10:42 AM</small></div><b>-₹840</b></div><div class="transaction"><span class="transaction-icon travel">T</span><div><strong>Metro recharge</strong><small>Yesterday, 6:18 PM</small></div><b>-₹500</b></div></article><article class="budget-card"><div class="section-heading"><div><h2>Monthly budget</h2><p>Keep your spending on track.</p></div><strong>68%</strong></div><div class="progress"><span></span></div><div class="budget-meta"><span>₹12,430 spent</span><span>₹18,000 limit</span></div></article></section>
+	</main>
+</div>

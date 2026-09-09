@@ -1,0 +1,72 @@
+<main class="login-page">
+	<section class="welcome-panel" aria-labelledby="welcome-title">
+		<div class="brand-mark" aria-hidden="true">E</div>
+		<p class="eyebrow">Everyday expense tracker</p>
+		<h1 id="welcome-title">Make every rupee count.</h1>
+		<p class="welcome-copy">Track spending, understand your habits, and stay in control of your money.</p>
+		<div class="signal" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+	</section>
+
+	<section class="form-panel" [attr.aria-labelledby]="isSignUp() ? 'register-title' : 'login-title'">
+		<div class="form-wrap">
+			<p class="eyebrow">{{ isSignUp() ? 'Get started' : 'Welcome back' }}</p>
+			<h2 [id]="isSignUp() ? 'register-title' : 'login-title'">
+				{{ isSignUp() ? 'Create your account' : 'Sign in to Expense Tracker' }}
+			</h2>
+			<p class="form-intro">
+				{{ isSignUp() ? 'Start tracking your expenses and mastering your budget.' : 'Access your spending dashboard and financial insights.' }}
+			</p>
+
+			<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+				<label for="username">Username</label>
+				<input id="username" type="text" formControlName="username" autocomplete="username" placeholder="Enter your username" />
+				@if (submitted() && loginForm.controls.username.invalid) {
+					<span class="error">Username is required.</span>
+				}
+
+				@if (isSignUp()) {
+					<label for="email">Email</label>
+					<input id="email" type="email" formControlName="email" autocomplete="email" placeholder="name@example.com" />
+					@if (submitted() && loginForm.controls.email.invalid) {
+						<span class="error">A valid email address is required.</span>
+					}
+				}
+
+				<label for="password">Password</label>
+				<input id="password" type="password" formControlName="password" autocomplete="current-password" placeholder="Enter your password" />
+				@if (submitted() && loginForm.controls.password.invalid) {
+					<span class="error">Password must be at least 6 characters.</span>
+				}
+
+				@if (!isSignUp()) {
+					<div class="form-options">
+						<label class="remember-option"><input type="checkbox" formControlName="rememberMe" /> <span>Remember me</span></label>
+						<a href="/login">Forgot password?</a>
+					</div>
+				}
+
+				@if (errorMessage()) {
+					<span class="error" role="alert">{{ errorMessage() }}</span>
+				}
+
+				<button type="submit" [disabled]="isSubmitting()">
+					{{ isSubmitting() ? (isSignUp() ? 'Creating account...' : 'Signing in...') : (isSignUp() ? 'Create account' : 'Sign in') }}
+					<span aria-hidden="true">-&gt;</span>
+				</button>
+			</form>
+
+			@if (!isSignUp()) {
+				<p class="signup-prompt">
+					New to expense tracking?
+					<button type="button" class="link-btn" (click)="toggleMode()">Create an account</button>
+				</p>
+			} @else {
+				<p class="signup-prompt">
+					Already have an account?
+					<button type="button" class="link-btn" (click)="toggleMode()">Sign in</button>
+				</p>
+			}
+		</div>
+		<p class="legal">Your financial data stays private and secure.</p>
+	</section>
+</main>

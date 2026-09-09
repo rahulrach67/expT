@@ -1,0 +1,143 @@
+<div class="budgets-shell">
+	<app-sidenav />
+	<main class="budgets-content">
+		<header class="budgets-header">
+			<div>
+				<p class="eyebrow">Workspace / Financial Planning</p>
+				<h1>Budgets &amp; Limits</h1>
+				<p class="subtitle">Set category thresholds to keep your spending on target.</p>
+			</div>
+			<button class="primary-button" type="button" (click)="toggleSetForm()">
+				<span aria-hidden="true">{{ showSetForm() ? '✕' : '+' }}</span>
+				{{ showSetForm() ? 'Close' : 'Set Category Budget' }}
+			</button>
+		</header>
+
+		@if (errorMessage()) {
+			<div class="error-banner" role="alert">{{ errorMessage() }}</div>
+		}
+
+		<!-- Set / Edit Budget Form -->
+		@if (showSetForm()) {
+			<section class="set-panel">
+				<div class="panel-heading">
+					<div>
+						<h2>Configure Category Limit</h2>
+						<p>Allocate a monthly spending ceiling for a specific category.</p>
+					</div>
+				</div>
+				<form [formGroup]="budgetForm" (ngSubmit)="saveBudget()">
+					<div class="form-grid">
+						<div class="field">
+							<label for="category">Category</label>
+							<select id="category" formControlName="category">
+								@for (cat of categories; track cat) {
+									<option [value]="cat">{{ cat }}</option>
+								}
+							</select>
+						</div>
+						<div class="field">
+							<label for="monthly_limit">Monthly Budget Limit (₹)</label>
+							<input id="monthly_limit" type="number" formControlName="monthly_limit" placeholder="e.g. 5000" min="100" />
+						</div>
+					</div>
+					<div class="form-actions">
+						<button type="button" class="cancel-button" (click)="toggleSetForm()">Cancel</button>
+						<button type="submit" class="submit-button" [disabled]="isSaving()">
+							{{ isSaving() ? 'Saving...' : 'Save Budget' }}
+						</button>
+					</div>
+				</form>
+			</section>
+		}
+
+		<!-- Overall Monthly Summary Card -->
+		<section class="overview-card">
+			<div class="overview-main">
+				<div>
+					<span class="badge-pill">This Month</span>
+					<h2>Total Monthly Spending vs. Budget</h2>
+					<p class="overview-subtitle">Consolidated expenditure across all budgeted categories.</p>
+				</div>
+				<div class="overview-stat">
+					<strong>{{ overallPercentage() }}%</strong>
+					<small>of total allocated budget used</small>
+				</div>
+			</div>
+
+			<div class="progress-bar-large">
+				<div 
+					class="progress-fill" 
+					[class]="getStatusClass(overallPercentage())" 
+					[style.width.%]="overallPercentage()"></div>
+			</div>
+
+			<div class="overview-footer">
+				<div>
+					<span>Total Spent</span>
+					<b>₹{{ totalSpent().toLocaleString('en-IN') }}</b>
+				</div>
+				<div>
+					<span>Total Budget Limit</span>
+					<b>₹{{ totalBudget().toLocaleString('en-IN') }}</b>
+				</div>
+				<div>
+					<span>Remaining Cap</span>
+					<b [class.positive]="totalRemaining() > 0" [class.negative]="totalRemaining() === 0">
+						₹{{ totalRemaining().toLocaleString('en-IN') }}
+					</b>
+				</div>
+			</div>
+		</section>
+
+		<!-- Category Cards Grid -->
+		<section class="section-title">
+			<h2>Category Allocations</h2>
+			<p>Live progress tracking based on your logged transactions.</p>
+		</section>
+
+		@if (isLoading()) {
+			<div class="loading-state">Loading your category budgets...</div>
+		} @else if (budgets().length === 0) {
+			<div class="loading-state">No budgets set yet. Click "+ Set Category Budget" above to create one.</div>
+		} @else {
+			<div class="cards-grid">
+				@for (b of budgets(); track b.id) {
+					<article class="budget-card">
+						<div class="card-top">
+							<div>
+								<span class="cat-pill">{{ b.category }}</span>
+								<h3>₹{{ b.spent.toLocaleString('en-IN') }}</h3>
+								<small>spent of ₹{{ b.monthly_limit.toLocaleString('en-IN') }}</small>
+							</div>
+							<div class="pct-badge" [class]="getStatusClass(b.percentage)">
+								{{ b.percentage }}%
+							</div>
+						</div>
+
+						<div class="progress-bar-sm">
+							<div 
+								class="progress-fill" 
+								[class]="getStatusClass(b.percentage)" 
+								[style.width.%]="b.percentage > 100 ? 100 : b.percentage"></div>
+						</div>
+
+						<div class="card-bottom">
+							<span>
+								@if (b.remaining >= 0) {
+									<b>₹{{ b.remaining.toLocaleString('en-IN') }}</b> remaining
+								} @else {
+									<b class="negative">₹{{ (-b.remaining).toLocaleString('en-IN') }}</b> over budget
+								}
+							</span>
+							<div class="actions">
+								<button type="button" class="btn-icon" (click)="toggleSetForm(b)" title="Edit budget limit">✎</button>
+								<button type="button" class="btn-icon delete" (click)="deleteBudget(b)" title="Delete budget">✕</button>
+							</div>
+						</div>
+					</article>
+				}
+			</div>
+		}
+	</main>
+</div>

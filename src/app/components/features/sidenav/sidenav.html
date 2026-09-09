@@ -1,0 +1,22 @@
+<aside class="sidenav">
+	<div class="brand"><span class="brand-mark">E</span><span>Expense Tracker</span></div>
+	<nav aria-label="Main navigation">
+		<p class="nav-label">Workspace</p>
+		@for (item of menuItems; track item.label) {
+		<a class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="item.href">
+			<span class="nav-icon" aria-hidden="true">{{ item.icon === 'dashboard' ? '▦' : item.icon === 'receipt' ? '[]' : item.icon === 'budget' ? '$' : item.icon === 'chart' ? '◫' : '//' }}</span>
+			{{ item.label }}
+		</a>
+		}
+		@if (canViewUsers()) { <p class="nav-label masters-label">Masters</p> }
+		@for (item of masterItems; track item.label) {
+		@if (canViewUsers()) {
+		<a class="nav-item" routerLinkActive="active" [routerLink]="item.href">
+			<span class="nav-icon" aria-hidden="true">♙</span>
+			{{ item.label }}
+		</a>
+		}
+		}
+	</nav>
+	<div class="sidenav-footer"><div class="avatar">{{ initials }}</div><div class="account-details"><strong>{{ userName }}</strong><small>Personal account</small></div><button class="logout-button" type="button" (click)="onLogout()" aria-label="Log out">↪<span>Logout</span></button></div>
+</aside>

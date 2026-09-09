@@ -1,0 +1,191 @@
+<div class="transactions-shell">
+	<app-sidenav />
+	<main class="transactions-content">
+		<header class="transactions-header">
+			<div>
+				<p class="eyebrow">Workspace / Activity</p>
+				<h1>Transactions</h1>
+				<p class="subtitle">Record and manage your incoming and outgoing financial transactions.</p>
+			</div>
+			<button class="primary-button" type="button" (click)="toggleAddForm()">
+				<span aria-hidden="true">{{ showAddForm() ? '✕' : '+' }}</span>
+				{{ showAddForm() ? 'Close' : 'Add Transaction' }}
+			</button>
+		</header>
+
+		@if (errorMessage()) {
+			<div class="error-banner" role="alert">{{ errorMessage() }}</div>
+		}
+
+		<!-- Summary Cards -->
+		<section class="summary-grid" aria-label="Transactions summary">
+			<article class="summary-card">
+				<span class="card-icon green">↓</span>
+				<p>Total Income</p>
+				<strong>₹{{ totalIncome().toLocaleString('en-IN') }}</strong>
+				<small class="positive">Logged receipts</small>
+			</article>
+			<article class="summary-card">
+				<span class="card-icon orange">↑</span>
+				<p>Total Expenses</p>
+				<strong>₹{{ totalExpenses().toLocaleString('en-IN') }}</strong>
+				<small class="negative">Logged spending</small>
+			</article>
+			<article class="summary-card">
+				<span class="card-icon blue">₹</span>
+				<p>Net Balance</p>
+				<strong>₹{{ netBalance().toLocaleString('en-IN') }}</strong>
+				<small [class.positive]="netBalance() >= 0" [class.negative]="netBalance() < 0">
+					{{ netBalance() >= 0 ? 'Surplus' : 'Deficit' }}
+				</small>
+			</article>
+		</section>
+
+		<!-- Add Transaction Panel -->
+		@if (showAddForm()) {
+			<section class="add-panel">
+				<div class="panel-heading">
+					<div>
+						<h2>Add New Transaction</h2>
+						<p>Record a payment or incoming credit.</p>
+					</div>
+				</div>
+				<form [formGroup]="txForm" (ngSubmit)="saveTransaction()">
+					<div class="form-grid">
+						<div class="field">
+							<label for="title">Title / Merchant</label>
+							<input id="title" type="text" formControlName="title" placeholder="e.g. Fresh Market, Salary" />
+						</div>
+						<div class="field">
+							<label for="amount">Amount (₹)</label>
+							<input id="amount" type="number" formControlName="amount" placeholder="e.g. 1500" min="1" />
+						</div>
+						<div class="field">
+							<label for="type">Type</label>
+							<select id="type" formControlName="type">
+								<option value="Expense">Expense</option>
+								<option value="Income">Income</option>
+							</select>
+						</div>
+						<div class="field">
+							<label for="category">Category</label>
+							<select id="category" formControlName="category">
+								@for (cat of categories; track cat) {
+									<option [value]="cat">{{ cat }}</option>
+								}
+							</select>
+						</div>
+						<div class="field">
+							<label for="date">Date</label>
+							<input id="date" type="date" formControlName="date" />
+						</div>
+						<div class="field field-full">
+							<label for="notes">Notes (Optional)</label>
+							<input id="notes" type="text" formControlName="notes" placeholder="Additional details..." />
+						</div>
+					</div>
+					<div class="form-actions">
+						<button type="button" class="cancel-button" (click)="toggleAddForm()">Cancel</button>
+						<button type="submit" class="submit-button" [disabled]="isSaving()">
+							{{ isSaving() ? 'Saving...' : 'Save Transaction' }}
+						</button>
+					</div>
+				</form>
+			</section>
+		}
+
+		<!-- Filter Toolbar & Table -->
+		<section class="table-card">
+			<div class="toolbar">
+				<div class="search-box">
+					<span aria-hidden="true">🔍</span>
+					<input 
+						type="text" 
+						placeholder="Search by title, category, or notes..." 
+						[value]="searchQuery()" 
+						(input)="searchQuery.set($any($event.target).value)" 
+					/>
+				</div>
+				<div class="filters">
+					<div class="type-pill-group">
+						<button 
+							type="button" 
+							[class.active]="filterType() === 'All'" 
+							(click)="filterType.set('All')">All</button>
+						<button 
+							type="button" 
+							[class.active]="filterType() === 'Expense'" 
+							(click)="filterType.set('Expense')">Expenses</button>
+						<button 
+							type="button" 
+							[class.active]="filterType() === 'Income'" 
+							(click)="filterType.set('Income')">Income</button>
+					</div>
+					<select [value]="filterCategory()" (change)="filterCategory.set($any($event.target).value)">
+						<option value="All">All Categories</option>
+						@for (cat of categories; track cat) {
+							<option [value]="cat">{{ cat }}</option>
+						}
+					</select>
+				</div>
+			</div>
+
+			@if (isLoading()) {
+				<div class="empty-state">Loading transactions...</div>
+			} @else if (filteredTransactions().length === 0) {
+				<div class="empty-state">No transactions match your filters.</div>
+			} @else {
+				<div class="table-wrap">
+					<table>
+						<thead>
+							<tr>
+								<th>Transaction</th>
+								<th>Category</th>
+								<th>Date</th>
+								<th>Type</th>
+								<th class="text-right">Amount</th>
+								<th class="text-right">Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							@for (tx of filteredTransactions(); track tx.id) {
+								<tr>
+									<td>
+										<div class="tx-title-cell">
+											<span class="tx-badge" [class.income]="tx.type === 'Income'" [class.expense]="tx.type === 'Expense'">
+												{{ tx.type === 'Income' ? '↓' : '↑' }}
+											</span>
+											<div>
+												<strong>{{ tx.title }}</strong>
+												@if (tx.notes) {
+													<small>{{ tx.notes }}</small>
+												}
+											</div>
+										</div>
+									</td>
+									<td><span class="category-pill">{{ tx.category }}</span></td>
+									<td>{{ tx.date }}</td>
+									<td>
+										<span class="type-badge" [class.income]="tx.type === 'Income'" [class.expense]="tx.type === 'Expense'">
+											{{ tx.type }}
+										</span>
+									</td>
+									<td class="text-right">
+										<b [class.positive]="tx.type === 'Income'" [class.negative]="tx.type === 'Expense'">
+											{{ tx.type === 'Income' ? '+' : '-' }}₹{{ tx.amount.toLocaleString('en-IN') }}
+										</b>
+									</td>
+									<td class="text-right">
+										<button type="button" class="delete-btn" (click)="deleteTransaction(tx)" title="Delete transaction">
+											✕
+										</button>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			}
+		</section>
+	</main>
+</div>

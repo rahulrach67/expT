@@ -1,0 +1,179 @@
+<div class="reports-shell">
+	<app-sidenav />
+	<main class="reports-content">
+		<header class="reports-header">
+			<div>
+				<p class="eyebrow">Workspace / Analytics</p>
+				<h1>Financial Reports</h1>
+				<p class="subtitle">Comprehensive overview of your earnings, cashflow, and spending patterns.</p>
+			</div>
+			<div class="period-toggle">
+				<button 
+					type="button" 
+					[class.active]="selectedPeriod() === 'This Month'"
+					(click)="selectedPeriod.set('This Month')">This Month</button>
+				<button 
+					type="button" 
+					[class.active]="selectedPeriod() === 'Last 3 Months'"
+					(click)="selectedPeriod.set('Last 3 Months')">Last 3 Months</button>
+				<button 
+					type="button" 
+					[class.active]="selectedPeriod() === 'All Time'"
+					(click)="selectedPeriod.set('All Time')">All Time</button>
+			</div>
+		</header>
+
+		@if (errorMessage()) {
+			<div class="error-banner" role="alert">{{ errorMessage() }}</div>
+		}
+
+		@if (isLoading()) {
+			<div class="loading-state">Analyzing financial data...</div>
+		} @else if (reportData(); as data) {
+			<!-- 4 KPI Summary Cards -->
+			<section class="summary-grid" aria-label="Financial health snapshot">
+				<article class="summary-card">
+					<span class="card-icon green">↓</span>
+					<p>Total Inflow</p>
+					<strong>₹{{ data.summary.totalIncome.toLocaleString('en-IN') }}</strong>
+					<small class="positive">Cumulative receipts</small>
+				</article>
+
+				<article class="summary-card">
+					<span class="card-icon orange">↑</span>
+					<p>Total Outflow</p>
+					<strong>₹{{ data.summary.totalExpenses.toLocaleString('en-IN') }}</strong>
+					<small class="negative">Cumulative payments</small>
+				</article>
+
+				<article class="summary-card">
+					<span class="card-icon blue">₹</span>
+					<p>Net Savings</p>
+					<strong>₹{{ data.summary.netSavings.toLocaleString('en-IN') }}</strong>
+					<small [class.positive]="data.summary.netSavings >= 0" [class.negative]="data.summary.netSavings < 0">
+						{{ data.summary.netSavings >= 0 ? '+ Surplus generated' : '- Deficit incurred' }}
+					</small>
+				</article>
+
+				<article class="summary-card">
+					<span class="card-icon purple">%</span>
+					<p>Savings Rate</p>
+					<strong>{{ data.summary.savingsRate }}%</strong>
+					<small class="positive">Income retained</small>
+				</article>
+			</section>
+
+			<!-- Middle Grid: Cashflow Chart & Category Breakdown -->
+			<section class="analytics-grid">
+				<!-- Monthly Cashflow Bar Chart -->
+				<article class="chart-card">
+					<div class="card-heading">
+						<div>
+							<h2>Cashflow Trends</h2>
+							<p>Comparison of payments and receipts over recent months.</p>
+						</div>
+						<div class="legend">
+							<span class="key-payment"></span> Payments
+							<span class="key-receipt"></span> Receipts
+						</div>
+					</div>
+
+					<div class="chart-container">
+						<div class="chart-bars">
+							@for (trend of data.monthlyTrends; track trend.month) {
+								<div class="month-col">
+									<div class="bar-pair">
+										<div 
+											class="bar payment" 
+											[style.height.%]="getBarHeight(trend.payments)"
+											[title]="'Payments: ₹' + trend.payments"></div>
+										<div 
+											class="bar receipt" 
+											[style.height.%]="getBarHeight(trend.receipts)"
+											[title]="'Receipts: ₹' + trend.receipts"></div>
+									</div>
+									<span class="col-label">{{ trend.month }}</span>
+								</div>
+							}
+						</div>
+					</div>
+				</article>
+
+				<!-- Category Distribution Breakdown -->
+				<article class="category-card">
+					<div class="card-heading">
+						<div>
+							<h2>Spending by Category</h2>
+							<p>Expense allocation across all logged categories.</p>
+						</div>
+					</div>
+
+					<div class="cat-list">
+						@for (cat of data.categoryBreakdown; track cat.category) {
+							<div class="cat-item">
+								<div class="cat-info">
+									<span class="cat-name">{{ cat.category }}</span>
+									<span class="cat-amount">₹{{ cat.total.toLocaleString('en-IN') }} <small>({{ cat.percentage }}%)</small></span>
+								</div>
+								<div class="meter-bar">
+									<div class="meter-fill" [style.width.%]="cat.percentage"></div>
+								</div>
+							</div>
+						}
+					</div>
+				</article>
+			</section>
+
+			<!-- Bottom Insights Grid -->
+			<section class="insights-grid">
+				<article class="insight-card">
+					<div class="insight-header">
+						<span class="insight-icon">💡</span>
+						<div>
+							<h3>Financial Health Analysis</h3>
+							<p>Key takeaways based on current volume and velocity.</p>
+						</div>
+					</div>
+					<ul class="insight-bullets">
+						<li>
+							<strong>Savings Efficiency:</strong> Your savings rate stands at <b>{{ data.summary.savingsRate }}%</b>, well above the recommended 20% benchmark.
+						</li>
+						<li>
+							<strong>Top Expense Driver:</strong> 
+							@if (data.categoryBreakdown.length > 0) {
+								<b>{{ data.categoryBreakdown[0].category }}</b> represents your single largest expense category at <b>{{ data.categoryBreakdown[0].percentage }}%</b> of total spend.
+							} @else {
+								No expenses logged yet.
+							}
+						</li>
+						<li>
+							<strong>Transaction Velocity:</strong> You have recorded <b>{{ data.summary.totalTransactions }} transactions</b> across all accounts.
+						</li>
+					</ul>
+				</article>
+
+				<article class="recent-card">
+					<div class="card-heading">
+						<div>
+							<h3>Recent Ledger Activity</h3>
+							<p>Latest 5 transactions synchronized with reports.</p>
+						</div>
+					</div>
+					<div class="recent-list">
+						@for (tx of data.recentTransactions; track tx.id) {
+							<div class="recent-item">
+								<div>
+									<strong>{{ tx.title }}</strong>
+									<small>{{ tx.category }} • {{ tx.date }}</small>
+								</div>
+								<b [class.positive]="tx.type === 'Income'" [class.negative]="tx.type === 'Expense'">
+									{{ tx.type === 'Income' ? '+' : '-' }}₹{{ tx.amount.toLocaleString('en-IN') }}
+								</b>
+							</div>
+						}
+					</div>
+				</article>
+			</section>
+		}
+	</main>
+</div>
