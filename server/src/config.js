@@ -9,13 +9,11 @@ if (typeof process.loadEnvFile === 'function') {
     }
   }
 } else if (fs.existsSync('.env')) {
-  throw new Error('Node.js 20.12 or newer is required to load .env files.');
+  require('dotenv').config();
 }
 
 const config = {
-  port: Number(process.env.PORT ?? 3000),
-  jwtSecret: process.env.JWT_SECRET ?? 'development-only-change-me',
-  databaseUrl: process.env.DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5432/demo',
+  port: process.env.PORT || 3000,
 };
 
 module.exports = { config };
