@@ -6,8 +6,8 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "start:api": "node --watch server/src/server.js",
+    "start": "node server/src/server.js",
+    "start:api": "node server/src/server.js",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
