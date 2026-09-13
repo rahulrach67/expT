@@ -66,7 +66,7 @@ async function register(req, res) {
     );
     res.status(201).json({ token, user: { id: user.id, username: user.username, role: user.role } });
   } catch (error) {
-    console.log("the error becomeeeeeeee=================", err)
+    console.log("the error becomeeeeeeee=================", error)
 
     if (error.code === '23505') {
       res.status(409).json({ message: 'That username or email already exists.' });
