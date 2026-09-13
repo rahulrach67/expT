@@ -16,6 +16,7 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Backend is running successfully!');
 });
+console.log("are you listening............................");
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
@@ -26,3 +27,5 @@ app.use('/api/reports', reportsRoutes);
 app.listen(config.port, '0.0.0.0', () => {
   console.log(`API listening on port ${config.port}`);
 });
+
+module.exports = app;
