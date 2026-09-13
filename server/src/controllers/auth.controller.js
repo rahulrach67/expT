@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { config } = require('../config');
 const { createUser, findUserByUsername } = require('../models/user.model');
+console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 
 async function login(req, res) {
   console.log("rge login");
@@ -34,6 +35,8 @@ async function login(req, res) {
 }
 
 async function register(req, res) {
+  console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@WWWWWWWWWWWWWWWWSSSSSSSSSSSSSS");
+
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
