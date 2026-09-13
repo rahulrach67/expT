@@ -30,6 +30,7 @@ async function login(req, res) {
     res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
   } catch (err) {
     console.error('Login error:', err);
+    console.log("the error becomeeeeeeee=================", err)
     res.status(500).json({ message: 'Unable to sign in right now.' });
   }
 }
@@ -65,6 +66,8 @@ async function register(req, res) {
     );
     res.status(201).json({ token, user: { id: user.id, username: user.username, role: user.role } });
   } catch (error) {
+    console.log("the error becomeeeeeeee=================", err)
+
     if (error.code === '23505') {
       res.status(409).json({ message: 'That username or email already exists.' });
       return;
