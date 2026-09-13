@@ -4,6 +4,8 @@ const { config } = require('../config');
 const { createUser, findUserByUsername } = require('../models/user.model');
 
 async function login(req, res) {
+  console.log("rge login");
+
   const { username, password } = req.body;
   console.log('Login request received with username:', username);
 
@@ -25,7 +27,8 @@ async function login(req, res) {
 
     const token = jwt.sign({ sub: user.id, username: user.username, role: user.role }, config.jwtSecret, { expiresIn: '8h' });
     res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
-  } catch {
+  } catch (err) {
+    console.error('Login error:', err);
     res.status(500).json({ message: 'Unable to sign in right now.' });
   }
 }
