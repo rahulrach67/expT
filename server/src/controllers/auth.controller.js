@@ -13,6 +13,8 @@ async function login(req, res) {
   }
 
   try {
+    console.log("000000000000000000000000000000000000000000000000");
+
     const user = await findUserByUsername(username.trim());
     const passwordMatches = user ? await bcrypt.compare(password, user.password_hash) : false;
 
