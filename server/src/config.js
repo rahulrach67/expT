@@ -17,5 +17,6 @@ const config = {
   jwtSecret: process.env.JWT_SECRET || 'development-only-change-me',
   databaseUrl: process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/demo',
 };
+console.log("the config becomeeeee=============================",config)
 
 module.exports = { config };
