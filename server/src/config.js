@@ -15,8 +15,6 @@ if (typeof process.loadEnvFile === 'function') {
 const config = {
   port: process.env.PORT || 3000,
   jwtSecret: process.env.JWT_SECRET || 'development-only-change-me',
-  databaseUrl: 'postgresql://postgres:[YOUR-PASSWORD]@db.vinywygmfbjmqwpddgzk.supabase.co:5432/postgres' || 'postgres://postgres:postgres@localhost:5432/demo',
+  databaseUrl: process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/demo',
 };
-console.log("the config becomeeeee=============================",config)
-
 module.exports = { config };

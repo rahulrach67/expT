@@ -55,7 +55,9 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-            "proxyConfig": "proxy.conf.json"
+            "allowedHosts": [
+              "fifteen-legwork-ninja.ngrok-free.dev"
+            ]
           },
           "configurations": {
             "production": {

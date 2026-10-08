@@ -2,13 +2,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { config } = require('../config');
 const { createUser, findUserByUsername } = require('../models/user.model');
-console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 
 async function login(req, res) {
-  console.log("rge login");
-
   const { username, password } = req.body;
-  console.log('Login request received with username:', username);
 
   if (!username || !password) {
     res.status(400).json({ message: 'Username and password are required.' });
@@ -16,8 +12,6 @@ async function login(req, res) {
   }
 
   try {
-    console.log("000000000000000000000000000000000000000000000000");
-
     const user = await findUserByUsername(username.trim());
     const passwordMatches = user ? await bcrypt.compare(password, user.password_hash) : false;
 
@@ -30,14 +24,11 @@ async function login(req, res) {
     res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
   } catch (err) {
     console.error('Login error:', err);
-    console.log("the error becomeeeeeeee=================", err)
     res.status(500).json({ message: 'Unable to sign in right now.' });
   }
 }
 
 async function register(req, res) {
-  console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@WWWWWWWWWWWWWWWWSSSSSSSSSSSSSS");
-
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
@@ -66,8 +57,6 @@ async function register(req, res) {
     );
     res.status(201).json({ token, user: { id: user.id, username: user.username, role: user.role } });
   } catch (error) {
-    console.log("the error becomeeeeeeee=================", error)
-
     if (error.code === '23505') {
       res.status(409).json({ message: 'That username or email already exists.' });
       return;

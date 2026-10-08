@@ -1,7 +1,6 @@
 const cors = require('cors');
 const express = require('express');
 const { config } = require('./config');
-
 const { authRoutes } = require('./routes/auth.routes');
 const { usersRoutes } = require('./routes/users.routes');
 const { transactionsRoutes } = require('./routes/transactions.routes');
@@ -16,7 +15,10 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Backend is running successfully!');
 });
-console.log("are you listening............................");
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
