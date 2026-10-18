@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Budget {
   id: number;
@@ -14,7 +15,7 @@ export interface Budget {
 @Injectable({ providedIn: 'root' })
 export class BudgetService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = '/api/budgets';
+  private readonly apiUrl = `${environment.apiUrl.replace(/\/+$/, '')}${environment.apiUrl.endsWith('/api') ? '' : '/api'}/budgets`;
 
   getBudgets(): Observable<Budget[]> {
     return this.http.get<Budget[]>(this.apiUrl);

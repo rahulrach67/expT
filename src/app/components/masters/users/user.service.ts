@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 export interface UserRecord {
   id: number;
@@ -20,7 +21,7 @@ export interface CreateUserRequest {
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = '/api/users';
+  private readonly apiUrl = `${environment.apiUrl.replace(/\/+$/, '')}${environment.apiUrl.endsWith('/api') ? '' : '/api'}/users`;
 
   getUsers(): Observable<UserRecord[]> {
     return this.http.get<UserRecord[]>(this.apiUrl);

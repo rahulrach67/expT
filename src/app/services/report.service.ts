@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface ReportsSummary {
   summary: {
@@ -34,7 +35,7 @@ export interface ReportsSummary {
 @Injectable({ providedIn: 'root' })
 export class ReportService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = '/api/reports';
+  private readonly apiUrl = `${environment.apiUrl.replace(/\/+$/, '')}${environment.apiUrl.endsWith('/api') ? '' : '/api'}/reports`;
 
   getSummary(): Observable<ReportsSummary> {
     return this.http.get<ReportsSummary>(`${this.apiUrl}/summary`);
