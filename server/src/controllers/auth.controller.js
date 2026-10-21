@@ -42,26 +42,19 @@ async function register(req, res) {
   }
 
   try {
-     console.log("11111111111111111111111111111111111111111p",password);
-    console.log("22222222222222222222222222222222222222222u",username.trim());
-    const passwordHash = password ;
+    const passwordHash = await bcrypt.hash(password, 12);
     const user = await createUser({
       username: username.trim(),
       email: email.trim().toLowerCase(),
       passwordHash,
       role: 'Member',
     });
-   
-    
-    
 
     const token = jwt.sign(
       { sub: user.id, username: user.username, role: user.role },
       config.jwtSecret,
       { expiresIn: '8h' },
     );
-    // console.log("usrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrtoken",token);
-    
     res.status(201).json({ token, user: { id: user.id, username: user.username, role: user.role } });
   } catch (error) {
     if (error.code === '23505') {
@@ -69,7 +62,6 @@ async function register(req, res) {
       return;
     }
     console.error('Error registering user:', error);
-    console.log("the errrrrrrrrrrrooooooooooooooooooo222222",error)
     res.status(500).json({ message: 'Unable to create account right now.' });
   }
 }
