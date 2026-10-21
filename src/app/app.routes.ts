@@ -8,7 +8,7 @@ import { Users } from './components/masters/users/users';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-	{ path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+	{ path: '', pathMatch: 'full', redirectTo: 'login' },
 	{ path: 'login', component: Login },
 	{ path: 'dashboard', component: Dashboard, canActivate: [authGuard] },
 	{ path: 'transactions', component: Transactions, canActivate: [authGuard] },

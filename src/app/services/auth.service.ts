@@ -30,26 +30,40 @@ export class AuthService {
   private readonly apiUrl = `${environment.apiUrl.replace(/\/+$/, '')}${environment.apiUrl.endsWith('/api') ? '' : '/api'}`;
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    console.log("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyservicelogin")
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials).pipe(
       tap((response) => {
-        console.log("the response becomeeeeeeeeee==========",response);
-        
         localStorage.setItem('auth_token', response.token);
+        if (response.user?.id) {
+          localStorage.setItem('user_id', String(response.user.id));
+        }
+        if (response.user) {
+          localStorage.setItem('user_info', JSON.stringify(response.user));
+        }
       }),
     );
   }
 
   register(data: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, data).pipe(
-      tap((response) => {
-        localStorage.setItem('auth_token', response.token);
-      }),
-    );
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, data);
   }
 
   isAuthenticated(): boolean {
     return Boolean(localStorage.getItem('auth_token'));
+  }
+
+  getUserId(): number | null {
+    const storedId = localStorage.getItem('user_id');
+    if (storedId) return Number(storedId);
+
+    const token = localStorage.getItem('auth_token');
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1])) as { sub?: number; id?: number; user_id?: number };
+      return payload.sub ?? payload.id ?? payload.user_id ?? null;
+    } catch {
+      return null;
+    }
   }
 
   getRole(): string | null {
@@ -87,5 +101,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_id');
+    localStorage.removeItem('user_info');
   }
 }

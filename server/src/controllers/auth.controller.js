@@ -20,7 +20,11 @@ async function login(req, res) {
       return;
     }
 
-    const token = jwt.sign({ sub: user.id, username: user.username, role: user.role }, config.jwtSecret, { expiresIn: '8h' });
+    const token = jwt.sign(
+      { sub: user.id, id: user.id, user_id: user.id, username: user.username, role: user.role },
+      config.jwtSecret,
+      { expiresIn: '8h' }
+    );
     res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
   } catch (err) {
     console.error('Login error:', err);
@@ -51,7 +55,7 @@ async function register(req, res) {
     });
 
     const token = jwt.sign(
-      { sub: user.id, username: user.username, role: user.role },
+      { sub: user.id, id: user.id, user_id: user.id, username: user.username, role: user.role },
       config.jwtSecret,
       { expiresIn: '8h' },
     );

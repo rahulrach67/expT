@@ -1,12 +1,24 @@
 const { pool } = require('../db');
 
+function resolveUserId(req) {
+  return req.headers['x-user-id'] || req.headers['user-id'] || req.user?.sub || req.user?.id || req.user?.user_id;
+}
+
 async function getTransactions(req, res) {
+  const userId = resolveUserId(req);
+  if (!userId) {
+    res.status(401).json({ message: 'Authentication is required.' });
+    return;
+  }
+
   try {
     const result = await pool.query(
       `SELECT id, user_id, title, amount::float, type, category, 
               TO_CHAR(date, 'YYYY-MM-DD') as date, notes, created_at 
        FROM transactions 
-       ORDER BY date DESC, id DESC`
+       WHERE user_id = $1
+       ORDER BY date DESC, id DESC`,
+      [userId]
     );
     res.json(result.rows);
   } catch (error) {
@@ -17,7 +29,12 @@ async function getTransactions(req, res) {
 
 async function createTransaction(req, res) {
   const { title, amount, type = 'Expense', category, date, notes } = req.body;
-  const userId = req.user?.sub ?? null;
+  const userId = resolveUserId(req);
+
+  if (!userId) {
+    res.status(401).json({ message: 'Authentication is required.' });
+    return;
+  }
 
   if (!title || !amount || !category) {
     res.status(400).json({ message: 'Title, amount, and category are required.' });
@@ -48,8 +65,18 @@ async function createTransaction(req, res) {
 
 async function deleteTransaction(req, res) {
   const { id } = req.params;
+  const userId = resolveUserId(req);
+
+  if (!userId) {
+    res.status(401).json({ message: 'Authentication is required.' });
+    return;
+  }
+
   try {
-    const result = await pool.query('DELETE FROM transactions WHERE id = $1 RETURNING id', [id]);
+    const result = await pool.query(
+      'DELETE FROM transactions WHERE id = $1 AND user_id = $2 RETURNING id',
+      [id, userId]
+    );
     if (result.rowCount === 0) {
       res.status(404).json({ message: 'Transaction not found.' });
       return;

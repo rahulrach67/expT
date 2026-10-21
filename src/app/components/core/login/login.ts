@@ -16,6 +16,7 @@ export class Login {
   readonly submitted = signal(false);
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal('');
+  readonly successMessage = signal('');
   readonly loginForm = new FormGroup({
     username: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     email: new FormControl('', { nonNullable: true }),
@@ -28,6 +29,7 @@ export class Login {
     this.isSignUp.set(nextMode);
     this.submitted.set(false);
     this.errorMessage.set('');
+    this.successMessage.set('');
 
     if (nextMode) {
       this.loginForm.controls.email.setValidators([Validators.required, Validators.email]);
@@ -40,6 +42,7 @@ export class Login {
   onSubmit(): void {
     this.submitted.set(true);
     this.errorMessage.set('');
+    this.successMessage.set('');
 
     if (this.loginForm.invalid) return;
 
@@ -50,8 +53,14 @@ export class Login {
       this.authService.register({ username, email, password }).subscribe({
         next: () => {
           this.isSubmitting.set(false);
+          this.isSignUp.set(false);
+          this.loginForm.controls.password.reset();
+          this.loginForm.controls.email.clearValidators();
+          this.loginForm.controls.email.updateValueAndValidity();
           this.loginForm.markAsPristine();
-          void this.router.navigate(['/dashboard']);
+          this.submitted.set(false);
+          this.errorMessage.set('');
+          this.successMessage.set('Account created successfully! Please sign in with your credentials.');
         },
         error: (error: { error?: { message?: string } | string; status?: number }) => {
           this.isSubmitting.set(false);
