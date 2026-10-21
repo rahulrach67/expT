@@ -62,6 +62,7 @@ async function register(req, res) {
       return;
     }
     console.error('Error registering user:', error);
+    console.log("the errrrrrrrrrrrooooooooooooooooooo222222",error)
     res.status(500).json({ message: 'Unable to create account right now.' });
   }
 }
