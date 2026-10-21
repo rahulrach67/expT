@@ -42,15 +42,16 @@ async function register(req, res) {
   }
 
   try {
-    const passwordHash = await bcrypt.hash(password, 12);
+     console.log("11111111111111111111111111111111111111111p",password);
+    console.log("22222222222222222222222222222222222222222u",username.trim());
+    const passwordHash = password ;
     const user = await createUser({
       username: username.trim(),
       email: email.trim().toLowerCase(),
       passwordHash,
       role: 'Member',
     });
-    console.log("11111111111111111111111111111111111111111p",passwordHash);
-    console.log("22222222222222222222222222222222222222222u",user);
+   
     
     
 
@@ -59,7 +60,7 @@ async function register(req, res) {
       config.jwtSecret,
       { expiresIn: '8h' },
     );
-    console.log("usrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrtoken",token);
+    // console.log("usrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrtoken",token);
     
     res.status(201).json({ token, user: { id: user.id, username: user.username, role: user.role } });
   } catch (error) {
