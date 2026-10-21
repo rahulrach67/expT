@@ -49,6 +49,10 @@ async function register(req, res) {
       passwordHash,
       role: 'Member',
     });
+    console.log("11111111111111111111111111111111111111111p",passwordHash);
+    console.log("22222222222222222222222222222222222222222u",user);
+    
+    
 
     const token = jwt.sign(
       { sub: user.id, username: user.username, role: user.role },
