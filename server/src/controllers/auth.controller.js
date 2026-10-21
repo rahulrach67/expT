@@ -55,6 +55,8 @@ async function register(req, res) {
       config.jwtSecret,
       { expiresIn: '8h' },
     );
+    console.log("usrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrtoken",token);
+    
     res.status(201).json({ token, user: { id: user.id, username: user.username, role: user.role } });
   } catch (error) {
     if (error.code === '23505') {
