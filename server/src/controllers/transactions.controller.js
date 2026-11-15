@@ -1,9 +1,14 @@
 const { pool } = require('../db');
+const { resolveUserId } = require('../utils/jwt');
 
-function resolveUserId(req) {
-  return req.headers['x-user-id'] || req.headers['user-id'] || req.user?.sub || req.user?.id || req.user?.user_id;
-}
-
+/**
+ * Retrieves all transactions for the authenticated user.
+ * User ID is extracted from the verified JWT payload (req.user).
+ *
+ * @param {import('express').Request} req - Express request with authenticated JWT user.
+ * @param {import('express').Response} res - Express response returning transaction records array.
+ * @returns {Promise<void>}
+ */
 async function getTransactions(req, res) {
   const userId = resolveUserId(req);
   if (!userId) {
@@ -27,6 +32,14 @@ async function getTransactions(req, res) {
   }
 }
 
+/**
+ * Creates a new transaction record for the authenticated user.
+ * Associates the new transaction with the user ID from the verified JWT payload.
+ *
+ * @param {import('express').Request} req - Express request containing { title, amount, type, category, date, notes }.
+ * @param {import('express').Response} res - Express response returning the created transaction (201 Created).
+ * @returns {Promise<void>}
+ */
 async function createTransaction(req, res) {
   const { title, amount, type = 'Expense', category, date, notes } = req.body;
   const userId = resolveUserId(req);
@@ -63,6 +76,14 @@ async function createTransaction(req, res) {
   }
 }
 
+/**
+ * Deletes a transaction owned by the authenticated user.
+ * Ensures users can only delete transactions that belong to their verified JWT user ID.
+ *
+ * @param {import('express').Request} req - Express request with params { id } and authenticated JWT user.
+ * @param {import('express').Response} res - Express response (204 No Content on success, 404 if not found).
+ * @returns {Promise<void>}
+ */
 async function deleteTransaction(req, res) {
   const { id } = req.params;
   const userId = resolveUserId(req);
@@ -88,4 +109,10 @@ async function deleteTransaction(req, res) {
   }
 }
 
-module.exports = { createTransaction, deleteTransaction, getTransactions };
+module.exports = {
+  createTransaction,
+  deleteTransaction,
+  getTransactions,
+  resolveUserId,
+};
+

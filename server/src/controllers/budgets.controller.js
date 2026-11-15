@@ -1,8 +1,5 @@
 const { pool } = require('../db');
-
-function resolveUserId(req) {
-  return req.headers['x-user-id'] || req.headers['user-id'] || req.user?.sub || req.user?.id || req.user?.user_id;
-}
+const { resolveUserId } = require('../utils/jwt');
 
 async function getBudgets(req, res) {
   const userId = resolveUserId(req);

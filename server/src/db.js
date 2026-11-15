@@ -3,7 +3,7 @@ const { config } = require('./config');
 
 const poolConfig = { connectionString: config.databaseUrl };
 if (config.databaseUrl && !config.databaseUrl.includes('localhost')) {
-  poolConfig.ssl = { rejectUnauthorized: false };
+  // poolConfig.ssl = { rejectUnauthorized: false };
 }
 const pool = new pg.Pool(poolConfig);
 console.log('Database connection pool created with URL:');

@@ -25,6 +25,9 @@ app.use('/api/users', usersRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/budgets', budgetsRoutes);
 app.use('/api/reports', reportsRoutes);
+app.get('/test-db', (req, res) => {
+  res.json({ message: "Database connection successful!" });
+});
 
 app.listen(config.port, '0.0.0.0', () => {
   console.log(`API listening on port ${config.port}`);

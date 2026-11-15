@@ -12,9 +12,18 @@ if (typeof process.loadEnvFile === 'function') {
   require('dotenv').config();
 }
 
+/**
+ * Server application configuration loaded from environment variables (.env).
+ */
 const config = {
+  /** Express server port (defaults to 3000) */
   port: process.env.PORT || 3000,
+  /** JWT secret key for signing and verifying tokens */
   jwtSecret: process.env.JWT_SECRET || 'development-only-change-me',
+  /** JWT default token expiration time string (e.g. '8h', '1d', '60m') */
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '8h',
+  /** PostgreSQL connection URI */
   databaseUrl: process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/demo',
 };
+
 module.exports = { config };
